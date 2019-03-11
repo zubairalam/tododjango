@@ -1,0 +1,20 @@
+Objective:
+  Observer / Reason what all web server can do that an application server can't do
+1) setup a basic nginx (reverse proxy) + uwsgi + django todo app
+2) nginx load balancer + 2 todo applications
+3) static files
+4) cache content
+5) https
+6) url rewriting
+7) stackoverflow problems
+8) write blog. host your own blog using javascript framework for blog. gatsbyjs. host it yourself.
+9) upwork tasks
+
+
+
+basic deployment of django + uwsgi + nginx reverse proxy + static files + media files
+Solve stackoverflow problems for django + nginx
+    Do top 10 problems
+
+basic deployment of nginx + nodejs + websocket + redis
+Solve stackoverflow problems for nginx + nodejs

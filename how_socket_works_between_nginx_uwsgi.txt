@@ -1,0 +1,8 @@
+socket provides communication between two processes which are on different machines on a network or can be on the same machine.
+
+socket is combination of ip and a port
+ip specifies on which machine a process is running
+
+when a communication is happening using socket, one process will be server and other will be a client.
+
+each process will create their own socket, and each process is given permission to read/write to others socket.
