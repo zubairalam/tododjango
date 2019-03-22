@@ -1,4 +1,4 @@
-Django==1.11.14
+Django==1.11.19
 PyMySQL==0.8.0
 pytest==4.1.1
 uWSGI==2.0.18
