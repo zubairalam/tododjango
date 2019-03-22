@@ -19,8 +19,6 @@ Solve stackoverflow problems for django + nginx
 basic deployment of nginx + nodejs + websocket + redis
 Solve stackoverflow problems for nginx + nodejs
 
-Install git and clone the project
--------------------
 
 
 
