@@ -119,3 +119,79 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOG_LEVEL = 'INFO'
+# LOG_LEVEL = 'DEBUG' if DEBUG else 'INFO'
+LOGFILE_SIZE = 10 * 1024 * 1024  # 10 MB max log size
+LOGFILE_COUNT = 2
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'rq_console': {
+        'format': '%(asctime)s %(message)s',
+        'datefmt': '%H:%M:%S',
+        },
+        'verbose': {
+        'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+        'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+        'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file-django': {
+        'level': LOG_LEVEL,
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': 'logs/scada_site.log',
+        'maxBytes': LOGFILE_SIZE,
+        'backupCount': LOGFILE_COUNT,
+        'formatter': 'verbose'
+        },
+        'file-testing': {
+        'level': 'INFO',
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': 'logs/testing.log',
+        'maxBytes': LOGFILE_SIZE,
+        'backupCount': LOGFILE_COUNT,
+        'formatter': 'verbose'
+        },
+        'file-management': {
+        'level': LOG_LEVEL,
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': 'logs/scada_management.log',
+        'maxBytes': LOGFILE_SIZE,
+        'backupCount': LOGFILE_COUNT,
+        'formatter': 'verbose'
+        },
+        'console': {
+        'level': LOG_LEVEL,
+        'class': 'logging.StreamHandler',
+        'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django': {
+        'handlers': ['file-django'],
+        'propagate': True,
+        'level': LOG_LEVEL,
+        },
+        'testing': {
+        'handlers': ['file-testing'],
+        'propagate': True,
+        'level': LOG_LEVEL,
+        },
+        'management': {
+        'handlers': ['file-management'],
+        'propagate': True,
+        'level': LOG_LEVEL,
+        },
+        'console': {
+        'handlers': ['console'],
+        'propagate': True,
+        'level': LOG_LEVEL,
+        },
+    }
+}
