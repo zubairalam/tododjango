@@ -145,7 +145,7 @@ LOGGING = {
         'file-django': {
         'level': LOG_LEVEL,
         'class': 'logging.handlers.RotatingFileHandler',
-        'filename': 'logs/scada_site.log',
+        'filename': '/srv/logs/scada_site.log',
         'maxBytes': LOGFILE_SIZE,
         'backupCount': LOGFILE_COUNT,
         'formatter': 'verbose'
@@ -153,7 +153,7 @@ LOGGING = {
         'file-testing': {
         'level': 'INFO',
         'class': 'logging.handlers.RotatingFileHandler',
-        'filename': 'logs/testing.log',
+        'filename': '/srv/logs/testing.log',
         'maxBytes': LOGFILE_SIZE,
         'backupCount': LOGFILE_COUNT,
         'formatter': 'verbose'
@@ -161,7 +161,7 @@ LOGGING = {
         'file-management': {
         'level': LOG_LEVEL,
         'class': 'logging.handlers.RotatingFileHandler',
-        'filename': 'logs/scada_management.log',
+        'filename': '/srv/logs/scada_management.log',
         'maxBytes': LOGFILE_SIZE,
         'backupCount': LOGFILE_COUNT,
         'formatter': 'verbose'
