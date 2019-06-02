@@ -1,0 +1,150 @@
+---
+- import_playbook: users.yaml
+
+- name: install uwsgi + nginx
+  hosts: backend
+  remote_user: deployer
+  become: yes
+
+  tasks:
+
+    - name: Install epel, scl and rh-python
+      yum: pkg={{item}} state=installed
+      with_items:
+        - epel-release
+        - centos-release-scl
+        - setroubleshoot-server
+
+    - name: Install build tools
+      yum:
+        name: "@Development tools"
+        state: latest
+
+    - name: Install rh-python36
+      yum: pkg={{item}} state=installed
+      with_items:
+        - rh-python36
+        - python-pip
+        - python-devel
+
+    - name: Ensure sticky bit set to /srv/logs
+      file:
+        path: /srv/logs
+        state: directory
+        owner: nginx
+        group: nginx 
+        mode: g+s
+
+    - name: Ensure sticky bit set to /srv/src for nginx group
+      file:
+        path: /srv/src
+        state: directory
+        owner: nginx
+        group: nginx 
+        mode: g+s
+
+    - name: Clone github repo
+      git:
+        repo: git@github.com:zubairalam/tododjango.git
+        dest: /srv/src/tododjango
+        version: master
+        accept_hostkey: yes
+        key_file: /home/deployer/.ssh/id_rsa
+
+    - name: Ensure sticky bit set to /srv/venv for nginx group
+      file:
+        path: /srv/venv
+        state: directory
+        owner: nginx
+        group: nginx 
+        mode: g+s
+
+    - name: Pip install virtualenv
+      pip:
+        name: virtualenv
+
+    - name: Install pip requirements
+      pip: 
+        requirements: /srv/src/tododjango/project/requirements.txt
+        virtualenv: /srv/venv
+        virtualenv_command: virtualenv
+
+    - name: Ensure sticky bit set to /srv/uwsgi for nginx group
+      file:
+        path: /srv/uwsgi
+        state: directory
+        owner: nginx
+        group: nginx 
+        mode: g+s
+
+    - name: Create uwsgi.socket in uwsgi folder
+      file:
+        path: /srv/uwsgi/uwsgi.sock
+        state: touch 
+        owner: nginx
+        group: nginx 
+        mode: ug=rw,o-rwx
+
+    - name: Create uwsgi.service
+      template:
+        src: ./uwsgi.service.j2
+        dest: /etc/systemd/system/uwsgi.service
+        mode: u=rw,go=r
+        owner: root
+        group: root
+
+    - name: enable service uwsgi and ensure it is not masked
+      systemd:
+        name: uwsgi 
+        enabled: yes
+
+    - name: just force systemd to reread configs (2.4 and above)
+      systemd:
+        daemon_reload: yes
+
+    - name: Start uwsgi service
+      service: name=uwsgi state=started
+
+    - name: Install Nginx
+      yum: name=nginx state=present
+
+    - name: Configure Nginx for uwsgi upstream
+      template:
+        src: nginx2.conf.j2
+        dest: /etc/nginx/nginx.conf
+        mode: ug=rw,o-rwx
+
+    # - name: install letsencrypt
+    #   yum: name=certbot-nginx state=latest
+
+    # - name: Create letsencrypt certificate
+    #   shell: certbot certonly --nginx -d zubair.dev -d www.zubair.dev
+
+    # - name: Configure Nginx for uwsgi upstream 2
+    #   template:
+    #     src: nginx.conf.j2
+    #     dest: /etc/nginx/nginx.conf
+    #     mode: ug=rw,o-rwx
+
+    - name: Put SELinux in permissive mode, logging actions that would be blocked.
+      selinux:
+        policy: targeted
+        state: permissive
+
+    - name: Reloaded Nginx
+      service: name=nginx state=reloaded
+
+    # - name: Make a test curl request to app
+    #   uri:
+    #     url: "http://{{ ansible_host }}/"
+    #     method: GET 
+
+    # - name: Set httpd_can_network_connect flag on and keep it persistent across reboots
+    #   seboolean:
+    #     name: httpd_can_network_connect
+    #     state: yes
+    #     persistent: yes
+
+    # - name: Allow SELinux to let nginx write to uwsgi.sock 1
+    #   shell: grep nginx /var/log/audit/audit.log | audit2allow -M nginx && semodule -i nginx.pp
+

@@ -1,0 +1,14 @@
+[Unit]
+Description=Http Interface Server
+After=syslog.target
+
+[Service]
+KillSignal=SIGQUIT
+ExecStart=/srv/venv/bin/uwsgi --ini /srv/src/tododjango/project/uwsgi.ini
+Restart=always
+Type=notify
+NotifyAccess=all
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

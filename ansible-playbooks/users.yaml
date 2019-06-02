@@ -1,0 +1,35 @@
+---
+- name: Create non root deployer user with ssh and passwordless
+  hosts: backend 
+  remote_user: root
+  become: no
+
+  tasks:
+    - name: Create non root user deployer without password
+      user:
+        name: deployer
+        groups: wheel
+        append: yes
+        state: present
+
+    - group: name=nginx state=present
+
+    - name: Ensure user nginx and group nginx exists
+      user:
+        name: nginx 
+        groups: nginx 
+        append: yes
+        state: present
+
+    - name: set authorized key for remote user deployer
+      authorized_key:
+        user: deployer
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+    - name: make deployer passwordless account
+      template: 
+        src: ./sudoers.template.j2 
+        dest: /etc/sudoers.d/deployer
+        mode: "440" 
+        validate: /usr/sbin/visudo -cf %s
